@@ -1,5 +1,5 @@
 # booked
-A few modification of Booked Scheduler (http://www.bookedscheduler.com/)
+Booked Scheduler CAS Authentication plugin (http://www.bookedscheduler.com/)
 
 Installation :
 
