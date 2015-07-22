@@ -57,7 +57,7 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
 			</p>
 			{/if}
       
-      <a href="{$smarty.server.SCRIPT_NAME}?doCAS=1">Authentification CAS</cas>
+      <a href="{$smarty.server.SCRIPT_NAME}?doCAS=1">Authentification CAS</a>
       
 			<p class="loginsubmit">
 				<button type="submit" name="{Actions::LOGIN}" class="button" tabindex="100" value="submit"><img
