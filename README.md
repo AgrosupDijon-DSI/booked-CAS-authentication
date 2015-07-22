@@ -1,3 +1,6 @@
+# booked
+Booked Scheduler CAS Authentication plugin (http://www.bookedscheduler.com/)
+
 Installation :
 
 Il faut copier le fichier login.tpl dans le répertoire /tpl/ et vider le répertoire de cache /tpl_c/
