@@ -1,8 +1,11 @@
-# booked
-Booked Scheduler CAS Authentication plugin (http://www.bookedscheduler.com/)
+# Booked
+Booked Scheduler Double Authentication plugin : CAS & Local
+http://www.bookedscheduler.com/
 
-Installation :
+Installation:
 
-Il faut copier le fichier login.tpl dans le répertoire /tpl/ et vider le répertoire de cache /tpl_c/
+* Unzip into /plugins/Authentication/CnertaCAS/
+* **Move** the login.tpl file into /tpl/
+* Clear the cache folder /tpl_c/
+* Activate CnertaCAS via the Application configuration
 
-Copy the file login.tpl in the folder /tpl/ and clear the cache folder : /tpl_c/

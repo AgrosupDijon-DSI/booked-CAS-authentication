@@ -1,191 +1,166 @@
 <?php
+
 /**
-Copyright 2011-2015 Nick Korbel
-Copyright 2013-2014 Bart Verheyde
-Copyright 2013-2014 Bryan Green
+  Copyright 2011-2015 Nick Korbel
+  Copyright 2013-2014 Bart Verheyde
+  Copyright 2013-2014 Bryan Green
 
-This file is part of Booked Scheduler.
+  This file is part of Booked Scheduler.
 
-Booked Scheduler is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  Booked Scheduler is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-Booked Scheduler is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  Booked Scheduler is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 require_once(ROOT_DIR . 'lib/Application/Authentication/namespace.php');
 require_once(ROOT_DIR . 'plugins/Authentication/CnertaCAS/namespace.php');
 
 class CnertaCAS extends Authentication implements IAuthentication
 {
-	private $authToDecorate;
-	private $registration;
 
-	/**
-	 * @var CASOptions
-	 */
-	private $options;
+    private $authToDecorate;
+    private $registration;
 
-	/**
-	 * @return Registration
-	 */
-	private function GetRegistration()
-	{
-		if ($this->registration == null)
-		{
-			$this->registration = new Registration();
-		}
+    /**
+     * @var CASOptions
+     */
+    private $options;
 
-		return $this->registration;
-	}
+    /**
+     * @return Registration
+     */
+    private function GetRegistration()
+    {
+        if ($this->registration == null) {
+            $this->registration = new Registration();
+        }
 
-	public function __construct(Authentication $authentication)
-	{
-		$this->options = new CnertaCASOptions();
-		$this->setCASSettings();
-		$this->authToDecorate = $authentication;    
-	}
-  
-
-	private function setCASSettings()
-	{
-		if ($this->options->IsCasDebugOn())
-		{
-			phpCAS::setDebug($this->options->DebugFile());
-		}
-		phpCAS::client($this->options->CasVersion(), $this->options->HostName(), $this->options->Port(),
-					   $this->options->ServerUri(), $this->options->ChangeSessionId());
-		if ($this->options->CasHandlesLogouts())
-		{
-			phpCAS::handleLogoutRequests(true, $this->options->LogoutServers());
-		}
-
-		if ($this->options->HasCertificate())
-		{
-			phpCAS::setCasServerCACert($this->options->Certificate());
-		}
-		phpCAS::setNoCasServerValidation();
-	}
-
-	public function Validate($username, $password)
-	{
-		try
-		{
-			if ($_GET["doCAS"] == 1) {
-        phpCAS::forceAuthentication();
-      } else {
-        return parent::Validate($username, $password);
-      }
-		} catch (Exception $ex)
-		{
-			Log::Error('CAS exception: %s', $ex);
-			return false;
-		}
-		return true;
-	}
-
-	public function Login($username, $loginContext)
-	{
-		if ($_GET["doCAS"] == 1) {
-      
-      Log::Debug('Attempting CAS login for username: %s', $username);
-  
-  		$isAuth = phpCAS::isAuthenticated();
-  		Log::Debug('CAS is auth ok: %s', $isAuth);
-  		$username = phpCAS::getUser();
-  		$this->Synchronize($username);
-  
-  		return $this->authToDecorate->Login($username, $loginContext);
-    } else {
-      return $this->authToDecorate->Login($username, $loginContext);
+        return $this->registration;
     }
-	}
 
-	/*public function Logout(UserSession $user)
-	{
-		Log::Debug('Attempting CAS logout for email: %s', $user->Email);
-		$this->authToDecorate->Logout($user);
-
-		if ($this->options->CasHandlesLogouts())
-		{
-			phpCAS::logout();
-		}
-	} */
-  public function Logout(UserSession $user)
-  {
-    Log::Debug('Attempting CAS logout for email: %s', $user->Email);
-    $this->authToDecorate->Logout($user);
-  
-    if ($this->options->CasHandlesLogouts()) {
-      phpCAS::logoutWithRedirectService('http://' . $_SERVER['SERVER_NAME']);
+    public function __construct(Authentication $authentication)
+    {
+        $this->options = new CnertaCASOptions();
+        $this->setCASSettings();
+        $this->authToDecorate = $authentication;
     }
-  }
 
-	public function AreCredentialsKnown()
-	{
-		
-    if ($_GET["doCAS"] == 1) {
-      return true;
-    } else {
-      return phpCAS::isAuthenticated();
+    private function setCASSettings()
+    {
+        if ($this->options->IsCasDebugOn()) {
+            phpCAS::setDebug($this->options->DebugFile());
+        }
+        phpCAS::client($this->options->CasVersion(), $this->options->HostName(), $this->options->Port(), $this->options->ServerUri(), $this->options->ChangeSessionId());
+        if ($this->options->CasHandlesLogouts()) {
+            phpCAS::handleLogoutRequests(true, $this->options->LogoutServers());
+        }
+
+        if ($this->options->HasCertificate()) {
+            phpCAS::setCasServerCACert($this->options->Certificate());
+        }
+        phpCAS::setNoCasServerValidation();
     }
-    
-	}
 
-	public function HandleLoginFailure(IAuthenticationPage $loginPage)
-	{
-		$this->authToDecorate->HandleLoginFailure($loginPage);
-	}
+    public function Validate($username, $password)
+    {
+        try {
+            if ($_GET["doCAS"] == 1) {
+                phpCAS::forceAuthentication();
+            } else {
+                return parent::Validate($username, $password);
+            }
+        } catch (Exception $ex) {
+            Log::Error('CAS exception: %s', $ex);
+            return false;
+        }
+        return true;
+    }
 
-	public function ShowUsernamePrompt()
-	{
-		return true;
-	}
+    public function Login($username, $loginContext)
+    {
+        if ($_GET["doCAS"] == 1) {
 
-	public function ShowPasswordPrompt()
-	{
-		return true;
-	}
+            Log::Debug('Attempting CAS login for username: %s', $username);
 
-	public function ShowPersistLoginPrompt()
-	{
-		return false;
-	}
-  public function ShowCasLink()
-	{
-		return true;
-	}
+            $isAuth = phpCAS::isAuthenticated();
+            Log::Debug('CAS is auth ok: %s', $isAuth);
+            $username = phpCAS::getUser();
+            $this->Synchronize($username);
 
-	public function ShowForgotPasswordPrompt()
-	{
-		return false;
-	}
+            return $this->authToDecorate->Login($username, $loginContext);
+        } else {
+            return $this->authToDecorate->Login($username, $loginContext);
+        }
+    }
 
-	private function Synchronize($username)
-	{
-		$registration = $this->GetRegistration();
+    public function Logout(UserSession $user)
+    {
+        Log::Debug('Attempting CAS logout for email: %s', $user->Email);
+        $this->authToDecorate->Logout($user);
 
-		$registration->Synchronize(
-			new AuthenticatedUser(
-				$username,
-				$username . $this->options->EmailSuffix(),
-				$username,
-				$username,
-				uniqid(),
-				Configuration::Instance()->GetKey(ConfigKeys::LANGUAGE),
-				Configuration::Instance()->GetDefaultTimezone(),
-				null,
-				null,
-				null), true
-		);
-	}
+        if ($this->options->CasHandlesLogouts()) {
+            phpCAS::logoutWithRedirectService('http://' . $_SERVER['SERVER_NAME']);
+        }
+    }
+
+    public function AreCredentialsKnown()
+    {
+
+        if ($_GET["doCAS"] == 1) {
+            return true;
+        } else {
+            return phpCAS::isAuthenticated();
+        }
+    }
+
+    public function HandleLoginFailure(IAuthenticationPage $loginPage)
+    {
+        $this->authToDecorate->HandleLoginFailure($loginPage);
+    }
+
+    public function ShowUsernamePrompt()
+    {
+        return true;
+    }
+
+    public function ShowPasswordPrompt()
+    {
+        return true;
+    }
+
+    public function ShowPersistLoginPrompt()
+    {
+        return false;
+    }
+
+    public function ShowCasLink()
+    {
+        return true;
+    }
+
+    public function ShowForgotPasswordPrompt()
+    {
+        return false;
+    }
+
+    private function Synchronize($username)
+    {
+        $registration = $this->GetRegistration();
+
+        $registration->Synchronize(
+                new AuthenticatedUser(
+                $username, $username . $this->options->EmailSuffix(), $username, $username, uniqid(), Configuration::Instance()->GetKey(ConfigKeys::LANGUAGE), Configuration::Instance()->GetDefaultTimezone(), null, null, null), true
+        );
+    }
+
 }
 
 ?>

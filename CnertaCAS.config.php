@@ -29,6 +29,6 @@ $conf['settings']['cas_logout_servers'] = 'cas.educagri.fr/cas/logout';				// Co
 
 $conf['settings']['cas.certificates'] = '';	// Path to certificate to use for CAS. Leave blank if no certificate should be used
 
-$conf['settings']['cas.debug.enabled'] = 'true';
-$conf['settings']['cas.debug.file'] = '/var/www/booked/log/phpcas.log';
+$conf['settings']['cas.debug.enabled'] = 'false';
+$conf['settings']['cas.debug.file'] = '/tmp/phpcas.log';
 ?>
