@@ -25,7 +25,7 @@ $conf['settings']['cas.server.uri'] = '';					// the URI the CAS server is respo
 $conf['settings']['cas.change.session.id'] = 'false';		// Allow phpCAS to change the session_id
 $conf['settings']['email.suffix'] = '@educagri.fr';		// Email suffix to use when storing CAS user account. IE, email addresses will be saved to Booked Scheduler as username@yourdomain.com
 
-$conf['settings']['cas_logout_servers'] = 'cas.educagri.fr/cas/logout';				// Comma separated list of servers to use for logout. Leave blank to not use cas logout servers
+$conf['settings']['cas.logout.servers'] = 'cas.educagri.fr/cas/logout';				// Comma separated list of servers to use for logout. Leave blank to not use cas logout servers
 
 $conf['settings']['cas.certificates'] = '';	// Path to certificate to use for CAS. Leave blank if no certificate should be used
 
